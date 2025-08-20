@@ -16,7 +16,8 @@ class Ruta {
     this.indicePorNombre = new Map(); // Mapa auxiliar para acceso rápido por nombre
   }
 
-  // Inserta una parada al inicio de la ruta — O(1)
+  // Inserta una parada al inicio — O(1)
+  // No requiere recorrido, simplemente ajusta punteros
   insertarAlInicio(nombre) {
     const nueva = new Parada(nombre);
     if (!this.inicio) {
@@ -30,7 +31,8 @@ class Ruta {
     this.longitud++;
   }
 
-  // Inserta una parada al final de la ruta — O(1)
+  // Inserta una parada al final — O(1)
+  // Similar a insertar al inicio, sin recorrido
   insertarAlFinal(nombre) {
     const nueva = new Parada(nombre);
     if (!this.fin) {
@@ -44,7 +46,8 @@ class Ruta {
     this.longitud++;
   }
 
-  // Inserta una parada en una posición específica — O(n)
+  // Inserta en posición intermedia — O(n)
+  // Requiere recorrer hasta la posición deseada
   insertarEnPosicion(pos, nombre) {
     if (pos < 0 || pos > this.longitud) {
       console.error("Posición inválida");
@@ -67,7 +70,8 @@ class Ruta {
     this.longitud++;
   }
 
-  // Elimina una parada por nombre — O(1) si se usa Map
+  // Elimina por nombre — O(1)
+  // Acceso directo gracias al Map, sin recorrido
   eliminarPorNombre(nombre) {
     const actual = this.indicePorNombre.get(nombre);
     if (!actual) {
@@ -85,7 +89,8 @@ class Ruta {
     this.longitud--;
   }
 
-  // Recorre la ruta hacia adelante — O(n)
+  // Recorre hacia adelante — O(n)
+  // Lineal respecto al número de paradas
   recorrerAdelante() {
     const recorrido = [];
     let actual = this.inicio;
@@ -96,7 +101,7 @@ class Ruta {
     return recorrido;
   }
 
-  // Recorre la ruta hacia atrás — O(n)
+  // Recorre hacia atrás — O(n)
   recorrerAtras() {
     const recorrido = [];
     let actual = this.fin;
@@ -107,7 +112,8 @@ class Ruta {
     return recorrido;
   }
 
-  // Simula movimiento rápido desde una parada en cualquier dirección — O(k)
+  // Movimiento rápido desde una parada — O(k)
+  // Donde k es el número de pasos solicitados
   moverDesde(nombre, direccion = "adelante", pasos = 1) {
     let actual = this.indicePorNombre.get(nombre);
     if (!actual) {
@@ -124,63 +130,69 @@ class Ruta {
   }
 }
 
-// 🧪 Ejemplo de uso básico
-const ruta = new Ruta();
+// 🧩 Renderiza visualmente el recorrido con animación
+function renderizarRecorrido(listaDeNombres, contenedorId = "recorrido") {
+  let ul = document.getElementById(contenedorId);
+  if (!ul) {
+    ul = document.createElement("ul");
+    ul.id = contenedorId;
+    document.body.appendChild(ul);
+  }
 
+  ul.innerHTML = "";
+
+  listaDeNombres.forEach(nombre => {
+    const li = document.createElement("li");
+    li.textContent = nombre;
+    li.classList.add("animada"); // 👈 Animación aplicada
+    ul.appendChild(li);
+  });
+}
+
+// 🧪 Benchmarking — Validación empírica de rendimiento
+// Permite comparar tiempos de ejecución de operaciones clave
+
+const ruta = new Ruta();
 ruta.insertarAlFinal("Terminal Norte");
 ruta.insertarAlFinal("Calle 45");
 ruta.insertarAlFinal("Centro");
 ruta.insertarEnPosicion(1, "Universidad");
 ruta.insertarAlInicio("Estación Sur");
 
-console.log("➡️ Adelante:", ruta.recorrerAdelante());
-console.log("⬅️ Atrás:", ruta.recorrerAtras());
+renderizarRecorrido(ruta.recorrerAdelante());
 
 ruta.eliminarPorNombre("Centro");
-console.log("🗑️ Sin 'Centro':", ruta.recorrerAdelante());
+renderizarRecorrido(ruta.recorrerAdelante());
 
-console.log("🚀 Movimiento rápido desde 'Universidad':", ruta.moverDesde("Universidad", "adelante", 2));
+renderizarRecorrido(ruta.moverDesde("Universidad", "adelante", 2));
 
-// 🧪 Ejemplo extendido: simulación de ruta alternativa
 const rutaAlternativa = new Ruta();
-
-// Inserciones iniciales
 rutaAlternativa.insertarAlFinal("Portal Oeste");
 rutaAlternativa.insertarAlFinal("Avenida 30");
 rutaAlternativa.insertarAlFinal("Estación Central");
 rutaAlternativa.insertarAlFinal("Museo");
 rutaAlternativa.insertarAlFinal("Parque Industrial");
-
-// Inserciones intermedias
 rutaAlternativa.insertarEnPosicion(2, "Hospital General");
 rutaAlternativa.insertarEnPosicion(4, "Zona Franca");
 rutaAlternativa.insertarAlInicio("Terminal Sur");
 
-// Recorrido completo
-console.log("🧭 Ruta alternativa completa:", rutaAlternativa.recorrerAdelante());
+renderizarRecorrido(rutaAlternativa.recorrerAdelante());
 
-// Eliminación condicional
 rutaAlternativa.eliminarPorNombre("Museo");
-rutaAlternativa.eliminarPorNombre("NoExiste"); // Validación de parada inexistente
+rutaAlternativa.eliminarPorNombre("NoExiste");
 
-console.log("🧹 Ruta sin 'Museo':", rutaAlternativa.recorrerAdelante());
+renderizarRecorrido(rutaAlternativa.recorrerAdelante());
+renderizarRecorrido(rutaAlternativa.moverDesde("Hospital General", "atrás", 3));
+renderizarRecorrido(rutaAlternativa.moverDesde("Zona Franca", "adelante", 3));
 
-// Simulación de recorrido parcial
-console.log("🚶 Movimiento desde 'Hospital General' hacia atrás:", rutaAlternativa.moverDesde("Hospital General", "atrás", 3));
-console.log("🚶 Movimiento desde 'Zona Franca' hacia adelante:", rutaAlternativa.moverDesde("Zona Franca", "adelante", 3));
-
-// Inserción masiva para escalabilidad
 for (let i = 0; i < 500; i++) {
   rutaAlternativa.insertarAlFinal("Extensión " + i);
 }
 
-// Validación de recorrido final
-console.log("📈 Ruta extendida (últimos 5 nodos):", rutaAlternativa.moverDesde("Extensión 495", "adelante", 5));
+renderizarRecorrido(rutaAlternativa.moverDesde("Extensión 495", "adelante", 5));
+renderizarRecorrido(rutaAlternativa.moverDesde("Extensión 499", "atrás", 5));
 
-// Recorrido inverso desde el extremo
-console.log("🔙 Recorrido inverso desde 'Extensión 499':", rutaAlternativa.moverDesde("Extensión 499", "atrás", 5));
-
-/** 🧪 Benchmarking */
+// 🧪 Benchmarking extendido
 console.time("Insertar al inicio");
 for (let i = 0; i < 10000; i++) {
   ruta.insertarAlInicio("Inicio " + i);
@@ -216,4 +228,5 @@ console.timeEnd("Recorrer hacia atrás"); // O(n)
 console.time("Movimiento rápido");
 const resultado = ruta.moverDesde("Inicio 9999", "adelante", 5);
 console.timeEnd("Movimiento rápido"); // O(k)
-console.log("🚀 Movimiento rápido:", resultado);
+renderizarRecorrido(resultado);
+
