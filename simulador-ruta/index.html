@@ -53,6 +53,24 @@
     .animada {
       animation: aparecer 0.4s ease-out;
     }
+
+    #rendimiento {
+      margin-top: 20px;
+      background-color: #f9f9f9;
+      padding: 15px;
+      border-left: 4px solid #3498db;
+      border-radius: 5px;
+    }
+
+    #rendimiento h3 {
+      margin-top: 0;
+      color: #2c3e50;
+    }
+
+    #rendimiento p {
+      margin: 5px 0;
+      font-weight: bold;
+    }
   </style>
 </head>
 <body>
@@ -65,6 +83,13 @@
   </div>
 
   <ul id="recorrido"></ul>
+
+  <!-- 🔍 Sección de rendimiento algorítmico -->
+  <div id="rendimiento">
+    <h3>📊 Rendimiento Algorítmico</h3>
+    <p id="complejidad"></p>
+    <p id="tiempo"></p>
+  </div>
 
   <script>
     class Nodo {
@@ -146,16 +171,26 @@
       });
     }
 
+    function mostrarRendimiento(complejidad, etiqueta, operacion) {
+      document.getElementById("complejidad").textContent = `Complejidad teórica: ${complejidad}`;
+      const inicio = performance.now();
+      const resultado = operacion();
+      const fin = performance.now();
+      const tiempo = (fin - inicio).toFixed(2);
+      document.getElementById("tiempo").textContent = `Tiempo de ejecución: ${tiempo} ms`;
+      renderizar(resultado);
+    }
+
     function recorrerAdelante() {
-      renderizar(ruta.recorrerAdelante());
+      mostrarRendimiento("O(n)", "Recorrido Adelante", () => ruta.recorrerAdelante());
     }
 
     function recorrerAtras() {
-      renderizar(ruta.recorrerAtras());
+      mostrarRendimiento("O(n)", "Recorrido Atrás", () => ruta.recorrerAtras());
     }
 
     function moverDesde(indice) {
-      renderizar(ruta.moverDesde(indice));
+      mostrarRendimiento("O(k)", "Mover Desde", () => ruta.moverDesde(indice));
     }
   </script>
 </body>
